@@ -1,11 +1,18 @@
 package com.example.restrictiondetector;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
+
+    private String lastResult = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -13,23 +20,31 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         TextView results = findViewById(R.id.txtResults);
-        Button scanBtn = findViewById(R.id.btnScan);
+        Button grabBtn = findViewById(R.id.btnGrab);
+        Button copyBtn = findViewById(R.id.btnCopy);
 
-        scanBtn.setOnClickListener(v -> {
-            RestrictionScanner.Report report = RestrictionScanner.scan(getApplicationContext());
+        grabBtn.setOnClickListener(v -> {
+            results.setText("Requesting root, running dumpsys device_policy...");
+            new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... voids) {
+                    String raw = RootPolicyScanner.dump();
+                    return RestrictionOutputParser.extractRestrictionNames(raw);
+                }
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("ACTIVE (").append(report.active.size()).append(")\n");
-            sb.append("--------------------\n");
-            for (String key : report.active) {
-                sb.append("\u2713 ").append(key).append('\n');
-            }
-            sb.append("\nINACTIVE (").append(report.inactive.size()).append(")\n");
-            sb.append("--------------------\n");
-            for (String key : report.inactive) {
-                sb.append("\u2717 ").append(key).append('\n');
-            }
-            results.setText(sb.toString());
+                @Override
+                protected void onPostExecute(String parsed) {
+                    lastResult = parsed;
+                    results.setText(parsed.isEmpty() ? "(no restrictions found)" : parsed);
+                }
+            }.execute();
+        });
+
+        copyBtn.setOnClickListener(v -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("restrictions", lastResult);
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
         });
     }
 }
