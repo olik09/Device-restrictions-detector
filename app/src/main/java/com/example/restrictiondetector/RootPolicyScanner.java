@@ -45,4 +45,32 @@ public final class RootPolicyScanner {
         }
         return output.toString();
     }
+
+    public static boolean hasRootAccess() {
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes("id\n");
+            os.writeBytes("exit\n");
+            os.flush();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            boolean rootConfirmed = false;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("uid=0")) {
+                    rootConfirmed = true;
+                }
+            }
+            process.waitFor();
+            return rootConfirmed;
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+    }
 }
