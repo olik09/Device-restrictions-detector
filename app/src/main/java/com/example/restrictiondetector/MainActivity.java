@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         TextView results = findViewById(R.id.txtResults);
+        TextView rootStatus = findViewById(R.id.txtRootStatus);
         MaterialButton grabBtn = findViewById(R.id.btnGrab);
         MaterialButton copyBtn = findViewById(R.id.btnCopy);
         SwitchMaterial themeSwitch = findViewById(R.id.switchTheme);
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(
                     isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
         });
+
+        checkRootStatus(rootStatus);
 
         grabBtn.setOnClickListener(v -> {
             results.setText("Requesting root, running dumpsys device_policy...");
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 protected void onPostExecute(String parsed) {
                     lastResult = parsed;
                     results.setText(parsed.isEmpty() ? "(no restrictions found)" : parsed);
+                    checkRootStatus(rootStatus);
                 }
             }.execute();
         });
@@ -66,6 +71,26 @@ public class MainActivity extends AppCompatActivity {
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void checkRootStatus(TextView rootStatus) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                return RootPolicyScanner.hasRootAccess();
+            }
+
+            @Override
+            protected void onPostExecute(Boolean granted) {
+                if (granted) {
+                    rootStatus.setText("Root granted");
+                    rootStatus.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.shiny_green));
+                } else {
+                    rootStatus.setText("Root not granted");
+                    rootStatus.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.shiny_red));
+                }
+            }
+        }.execute();
     }
 
     private void applySavedTheme() {
