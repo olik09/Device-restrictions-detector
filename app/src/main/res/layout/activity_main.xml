@@ -29,6 +29,17 @@
             android:text="Dark" />
     </LinearLayout>
 
+        <TextView
+        android:id="@+id/txtRootStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"
+        android:text="Checking root access..."
+        android:textColor="?attr/colorOnBackground" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnGrab"
         android:layout_width="match_parent"
