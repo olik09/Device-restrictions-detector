@@ -2,4 +2,6 @@
 <resources>
     <color name="teal">#4FD1C5</color>
     <color name="navy">#1B2430</color>
+    <color name="shiny_green">#00E676</color>
+    <color name="shiny_red">#FF1744</color>
 </resources>
