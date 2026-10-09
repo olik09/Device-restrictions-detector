@@ -6,18 +6,10 @@
     android:padding="16dp">
 
     <Button
-        android:id="@+id/btnScan"
+        android:id="@+id/btnGrab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Scan restrictions" />
-
-    <TextView
-        android:id="@+id/txtHint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="This lists restrictions from public UserManager API. For live per-call logging of which admin app sets which restriction, enable this module for 'Android system (system_server)' in LSPosed Manager, reboot, then check the LSPosed Manager module logs."
-        android:textSize="12sp" />
+        android:text="Grab Restrictions" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,6 +23,14 @@
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
             android:textIsSelectable="true"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
     </ScrollView>
+
+    <Button
+        android:id="@+id/btnCopy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Copy all" />
+
 </LinearLayout>
